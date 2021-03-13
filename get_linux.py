@@ -6,6 +6,13 @@ import csv
 import wget
 import pandas as pd
 
+import os
+from py7zr import unpack_7zarchive
+import shutil
+shutil.register_unpack_format('7zip', ['.7z'], unpack_7zarchive)
+dir_path = '/home/ec2-user'
+files_zipped ='/home/ec2-user/files/'
+
 
 # POBIERANIE DANYCH ZE STRONY
 r = requests.get('https://archive.org/download/stackexchange')
@@ -25,13 +32,6 @@ with open('files_downloaded.txt', newline='') as f:
     files_downloaded = pd.DataFrame(list(reader))
 
 files_to_download = pd.DataFrame(files)
-# for a in files:
-#     date_time_str = a[1]
-#     date_time_obj = datetime.datetime.strptime(date_time_str, '%d-%b-%Y %H:%M')
-#     print('Date:', date_time_obj.date())
-#     print('Time:', date_time_obj.time())
-#     print('Date-time:', date_time_obj)
-#     print(a[1])
 
 # TEN FRAGMENT KODU POZWALA STWORZYĆ PLIK FILES_DOWNLOADED.TXT KTÓRY BĘDZIE PÓŹNIEJ POTRZEBNY DO TRZYMANIA WERSJI PLIKU
 if populate_files_downloaded:
@@ -41,20 +41,7 @@ if populate_files_downloaded:
     with file:
         write = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
         write.writerows(filelist)
-
-# wget.download("https://archive.org/download/stackexchange/"+"writers.meta.stackexchange.com.7z")
-# print(files_to_download[files_to_download[0]=='writers.meta.stackexchange.com.7z'])
-#files[0].index(files[34][0])
-
-# for a in files_to_download.iterrows():
-    # print("File name: {file}, file version on server: {date}, file version downloaded: {currentDate}".format(file = a[1], date = a[2],currentDate = 'lel'))
-    # print(a[1])
-
-# for index, row in files_to_download.iterrows():
-#     print("""File name: {file},
-#      file version on server: {date},
-#       file version downloaded: {currentDate}""".format(
-#         file=row[0], date=row[1], currentDate=files_downloaded[1][files_downloaded[0] == row[0]]))
+    exit()
 
 for index, row in files_to_download.iterrows():
     date_from_server = datetime.datetime.strptime(row[1], '%d-%b-%Y %H:%M')
@@ -72,3 +59,18 @@ for index, row in files_to_download.iterrows():
         print('{file} saved'.format(file=row[0]))
 
 
+files = [f for f in os.listdir(files_zipped) if os.path.isfile(files_zipped+f)]
+for f in files:
+    if ".7z" in f and ".meta." in f and ".tmp" not in f and "stackoverflow" not in f:
+        directory = dir_path+'/unpack/'+f.split('.')[0]+'.meta/'
+
+    elif ".7z" in f and ".tmp" not in f and "stackoverflow" not in f:
+        directory = dir_path+'/unpack/'+f.split('.')[0]+'/'
+    else:
+        continue
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    #Archive(dir_path + '/' + f).extractall(directory)
+    shutil.unpack_archive(files_zipped + '/' + f, directory)
+    print(f+" saved")
+    os.remove(os.path.join(files_zipped, f))
