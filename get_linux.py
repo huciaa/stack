@@ -12,7 +12,7 @@ import shutil
 shutil.register_unpack_format('7zip', ['.7z'], unpack_7zarchive)
 dir_path = '/home/ec2-user'
 files_zipped ='/home/ec2-user/files/'
-
+lel
 
 # POBIERANIE DANYCH ZE STRONY
 r = requests.get('https://archive.org/download/stackexchange')
