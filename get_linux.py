@@ -104,7 +104,7 @@ for index, row in files_to_download.iterrows():
         '%d-%b-%Y %H:%M')
     if "stackoverflow" in row[0] and("pt." in row[0] or "es.stackoverflow" in row[0] or "es.meta.stackoverflow" in row[0]  or "ja." in row[0] or "ru." in row[0]):
         continue
-    if "stackoverflow.com-Badges" not in row[0]:
+    if "stackoverflow.com-Badges" in row[0]:
         continue
     if date_from_server > date_from_file:
         print("There is a newer version of {file}, starting download".format(file=row[0]))
